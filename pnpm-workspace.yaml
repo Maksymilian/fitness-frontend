@@ -1,0 +1,4 @@
+# pnpm's settings for this project. The services it calls are in ../fitness-backend, a project of
+# their own.
+allowBuilds:
+  esbuild: true

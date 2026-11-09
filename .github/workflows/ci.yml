@@ -1,0 +1,38 @@
+# Lints, tests and builds the app on every push to main and every pull request. The live tests
+# (pnpm test:live) need the services of fitness-backend running, so they run locally only.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Lint, test and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 12.10.1
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Lint (oxlint and the type check)
+        run: pnpm lint
+      - name: Tests (Vitest, jsdom)
+        run: pnpm test
+      - name: Production build
+        run: pnpm build
